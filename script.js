@@ -1,26 +1,52 @@
-const addTodo = () => {
- const inputValue = document.getElementById('todo').value;
-    if(!inputValue){
-        alert('Task should not be empty')
-        return;
+const form = document.getElementById("form");
+const input = document.getElementById("input");
+const todoUL = document.getElementById("todos");
+
+const todos = JSON.parse(localStorage.getItem('todos'));
+if(todos) {
+    todos.forEach(todo=> addTodo(todo))
+}
+
+form.addEventListener('submit',(e)=>{
+    e.preventDefault();
+    addTodo();
+})
+function addTodo(todo){
+    let todoText = input.value;
+    if(todo){
+         todoText=todo.text;
     }
-    // I want to save the input value in the local storage 
+    if(todoText){
+        const todoE1 = document.createElement('li');
+        if(todo && todo.completed){
+            todoE1.classList.add('completed')
+        }
+        todoE1.innerText = todoText;
+        todoE1.addEventListener('click', ()=>{
+            todoE1.classList.toggle('completed')
+            updateLS();
+        })
+        todoE1.addEventListener('contextmenu', (e) => {
+            e.preventDefault()
 
-    const todo = {
-        text: inputValue
-    };
-    
-    const existingData = localStorage.getItem("todos");
-    let todos=existingData ? JSON.parse(existingData) : [];
-    todos.push();
-    localStorage.setItem("todos",JSON.stringify(todo));
-    console.log("saved successfully");
-    // const getData = localStorage.getItem("todos");
-    // const parsedData = JSON.parse(getData);
-    // parsedData append on the todos ID
-    const addLi=document.createElement('li')
-    addLi.innerHTML = todos.text;
-    document.getElementById('todos').appendChild(addLi);
-    document.getElementById("todo").value = "";
+            todoE1.remove()
+            updateLS()
+        }) 
+        todoUL.appendChild(todoE1)
 
+        input.value = ''
+
+        updateLS()
+    }
+}
+function updateLS(){
+    todoE1= document.querySelectorAll('li');
+    const todos=[];
+    todoE1.forEach(todoE1=>{
+        todos.push({
+            text:todoE1.innerText,
+            completed:todoE1.classList.contains('completed')
+        })
+    })
+    localStorage.setItem('todos',JSON.stringify(todos))
 }
